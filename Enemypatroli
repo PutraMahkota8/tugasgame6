@@ -1,0 +1,106 @@
+using UnityEngine;
+
+public class Enemypatroli : MonoBehaviour
+{
+    public float speed = 2f;
+    public float batasKiri = -6f;
+    public float batasKanan = 6f;
+
+    public Transform player;
+
+    private bool keKanan = true;
+    private Rigidbody2D rb;
+
+    // ======================
+    // SPAWN SETTINGS
+    // ======================
+    public GameObject enemyPrefab;
+    public float spawnDelay = 5f;
+
+    // LIMIT ENEMY
+    public int maxEnemy = 5;
+
+    private float timer;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        timer = spawnDelay;
+    }
+
+    void Update()
+    {
+        // ROTASI HADAP PLAYER
+        HadapKePlayer();
+
+        // ======================
+        // SPAWN TIMER
+        // ======================
+        timer -= Time.deltaTime;
+
+        if (timer <= 0)
+        {
+            SpawnEnemy();
+            timer = spawnDelay;
+        }
+    }
+
+    void FixedUpdate()
+    {
+        Vector2 arah;
+
+        if (keKanan)
+        {
+            arah = Vector2.right;
+
+            if (transform.position.x >= batasKanan)
+            {
+                transform.position = new Vector3(batasKanan, transform.position.y, transform.position.z);
+                keKanan = false;
+            }
+        }
+        else
+        {
+            arah = Vector2.left;
+
+            if (transform.position.x <= batasKiri)
+            {
+                transform.position = new Vector3(batasKiri, transform.position.y, transform.position.z);
+                keKanan = true;
+            }
+        }
+
+        rb.velocity = arah * speed;
+    }
+
+    void HadapKePlayer()
+    {
+        if (player == null) return;
+
+        Vector3 direction = player.position - transform.position;
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+    }
+
+    void SpawnEnemy()
+    {
+        // HITUNG JUMLAH ENEMY
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        // JIKA SUDAH MAX, STOP SPAWN
+        if (enemies.Length >= maxEnemy)
+        {
+            return;
+        }
+
+        if (enemyPrefab == null) return;
+
+        // Spawn di dekat musuh
+        Vector3 spawnPos = transform.position +
+            new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), 0);
+
+        Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+    }
+}
