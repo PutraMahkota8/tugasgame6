@@ -1,0 +1,40 @@
+using UnityEngine;
+
+public class PlayerMovement : MonoBehaviour
+{
+    public float speed = 5f;
+
+    private Rigidbody2D rb;
+    private Vector2 input;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    void Update()
+    {
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+        input = new Vector2(h, v);
+
+        // 🔍 DEBUG INPUT
+        if (h != 0 || v != 0)
+        {
+            Debug.Log("Horizontal: " + h + " | Vertical: " + v);
+        }
+
+        // ROTASI
+        if (input != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(input.y, input.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        rb.velocity = input * speed;
+    }
+}
