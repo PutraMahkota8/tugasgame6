@@ -1,0 +1,19 @@
+using UnityEngine;
+
+public class Spawn : MonoBehaviour
+{
+    public GameObject enemyPrefab;
+    public Transform spawnPoint;
+
+    public float spawnTime = 3f;
+
+    void Start()
+    {
+        InvokeRepeating("SpawnEnemy", 1f, spawnTime);
+    }
+
+    void SpawnEnemy()
+    {
+        Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+    }
+}
